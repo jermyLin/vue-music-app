@@ -26,20 +26,13 @@ module.exports = {
       'common' : resolve('src/common'),
       'static' : ('../../static'),
       'components' : resolve('src/components'),
-      'src' : resolve('src')
+      'src' : resolve('src'),
+      'api': resolve('src/api'),
+      'base': resolve('src/base')
     }
   },
   module: {
     rules: [
-      {
-        test: /\.(js|vue)$/,
-        loader: 'eslint-loader',
-        enforce: 'pre',
-        include: [resolve('src'), resolve('test')],
-        options: {
-          formatter: require('eslint-friendly-formatter')
-        }
-      },
       {
         test: /\.vue$/,
         loader: 'vue-loader',
