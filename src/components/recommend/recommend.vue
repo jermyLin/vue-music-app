@@ -3,8 +3,8 @@
     <div class="recommend-content">
       <div>
         <div class="slide">
-          <swiper class="swiper-wrapper" :options="swiperOption" :not-next-tick="notNextTick" ref="mySwiper">
-            <swiper-slide class="swiper-item" :key="item.linkUrl" v-for="item in recommends">
+          <swiper v-show="recommends.length" class="swiper-wrapper" :options="swiperOption"  ref="mySwiper">
+            <swiper-slide  :key="item.linkUrl" v-for="item in recommends">
               <a :href="item.linkUrl">
                 <img width="100%" height="100%" :src="item.picUrl">
               </a>
@@ -33,7 +33,6 @@
     data() {
       return {
         recommends: [],
-        notNextTick: true,
         swiperOption: {
           initialSlide: 1,
           autoplay: 2000,
@@ -44,7 +43,12 @@
           pagination: '.swiper-pagination',
           paginationClickable: true,
           slidesPerView: 1,
-          mousewheelControl: true
+          debugger: true,
+          lazyLoading:true,
+          mousewheelControl: true,
+          onTransitionStart(swiper){
+            console.log(swiper)
+          },
         }
       }
     },
@@ -139,7 +143,7 @@
 <style>
   .swiper-pagination .swiper-pagination-bullet-active {
     opacity: 1;
-    background: #fff;
+    background: rgba(255, 255, 255, 0.8);
     width: 20px;
     border-radius: 5px;
     transition: all 0.5s linear;
