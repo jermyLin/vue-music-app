@@ -1,78 +1,88 @@
 <template>
   <div class="recommend" ref="recommend">
-    <div class="recommend-content">
+    <scroll ref="scroll" class="recommend-content" :data="discList">
       <div>
-        <div class="slide">
-          <swiper v-show="recommends.length" class="swiper-wrapper" :options="swiperOption"  ref="mySwiper">
-            <swiper-slide  :key="item.linkUrl" v-for="item in recommends">
-              <a :href="item.linkUrl">
-                <img width="100%" height="100%" :src="item.picUrl">
-              </a>
-            </swiper-slide>
-            <div class="swiper-pagination" slot="pagination"></div>
-          </swiper>
+        <div class="slider-wrapper">
+          <div v-show="recommends.length" class="slider-content">
+            <slider>
+              <swiper-slide  :key="item.linkUrl" v-for="item in recommends">
+                <a :href="item.linkUrl">
+                  <img @load="loadImages" width="100%" height="100%" :src="item.picUrl">
+                </a>
+              </swiper-slide>
+            </slider>
+          </div>
         </div>
         <div class="recommend-list">
           <h1 class="list-title">热门歌单推荐</h1>
+          <ul>
+            <li v-for="item in discList" class="item">
+              <div class="icon">
+                <img width="60" height="60" v-lazy="item.imgurl" alt="">
+              </div>
+              <div class="text">
+                <h2 class="name" v-html="item.creator.name"></h2>
+                <p class="desc" v-html="item.dissname"></p>
+              </div>
+            </li>
+          </ul>
         </div>
       </div>
-    </div>
+      <div class="loading-container" v-show="!discList.length">
+        <loading></loading>
+      </div>
+    </scroll>
   </div>
 </template>
 
 <script type="text/ecmascript-6">
   import {swiper, swiperSlide} from 'vue-awesome-swiper'
-  import {getRecommend} from 'api/recommend'
+  import {getRecommend,getDiscList} from 'api/recommend'
   import {ERR_OK} from 'api/config'
+  import slider from 'base/slider/slider'
+  import scroll from 'base/scroll/scroll'
+  import loading from 'base/loading/loading'
 
   export default {
     components: {
       swiper,
-      swiperSlide
+      swiperSlide,
+      slider,
+      scroll,
+      loading
     },
     data() {
       return {
         recommends: [],
-        swiperOption: {
-          initialSlide: 1,
-          autoplay: 2000,
-          autoplayDisableOnInteraction: false,
-          direction: 'horizontal',
-          speed: 1000,
-          loop: true,
-          pagination: '.swiper-pagination',
-          paginationClickable: true,
-          slidesPerView: 1,
-          debugger: true,
-          lazyLoading:true,
-          mousewheelControl: true,
-          onTransitionStart(swiper){
-            console.log(swiper)
-          },
-        }
+        discList:[]
       }
-    },
-    computed: {
-      swiper() {
-        return this.$refs.mySwiper.swiper
-      }
-    },
-    mounted() {
-      // you can use current swiper instance object to do something(swiper methods)
-      // 然后你就可以使用当前上下文内的swiper对象去做你想做的事了
-      console.log('this is current swiper instance object', this.swiper)
     },
     created() {
-      this._getRecommend()
+      this._getRecommend();
+      this._getDiscList()
     },
     methods: {
       _getRecommend() {
         getRecommend().then((res) => {
           if (res.code === ERR_OK) {
-            this.recommends = res.data.slider
+            this.recommends = res.data.slider;
             console.log(this.recommends)
           }
         })
+      },
+      _getDiscList() {
+        getDiscList().then((res)=>{
+          if (res.code === ERR_OK) {
+            this.discList = res.data.list;
+            console.log(this.discList)
+          }
+        })
+      },
+      loadImages() {
+        if(!this.checkLoaded){
+          this.$refs.scroll.refresh();
+          this.checkLoaded = true;
+        }
       },
     }
   }
@@ -88,22 +98,18 @@
       .recommend-content
         height: 100%
         overflow: hidden
-        .slide
+        .slider-wrapper
           position: relative
           width: 100%
           height: 0
           padding-top 40%
           overflow: hidden
-          .swiper-wrapper
+          .slider-content
             position absolute
             top 0
             left 0
-            .pagination
-              position: absolute;
-              text-align: center;
-              transition: 300ms;
-              transform: translate3d(0, 0, 0);
-              z-index: 10;
+            width 100%
+            height 100%
         .recommend-list
           .list-title
             height: 65px

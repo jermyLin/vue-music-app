@@ -1,0 +1,67 @@
+<template>
+  <div ref="wrapper">
+    <slot></slot>
+  </div>
+</template>
+
+<script type="text/ecmascript-6">
+  import BScroll from 'better-scroll'
+
+  export default {
+    components: {
+      BScroll
+    },
+    props: {
+      probeType: {
+        type: Number,
+        default: 1
+      },
+      click: {
+        type: Boolean,
+        default: true
+      },
+      data: {
+        type: Array,
+        default: null
+      }
+    },
+    mounted() {
+      setTimeout(() => {
+        this._initScroll()
+      }, 20)
+    },
+    methods: {
+      _initScroll() {
+        if(!this.$refs.wrapper){
+          return
+        }
+        this.scroll = new BScroll(this.$refs.wrapper,{
+          probeType : this.probeType,
+          click : this.click,
+        })
+      },
+      enable() {//启用 better-scroll，默认开启
+        this.scroll && this.scroll.enable()
+      },
+
+
+      disable() {//禁用 better-scroll
+        this.scroll && this.scroll.disable()
+      },
+
+      refresh() {//销毁 better-scroll，解绑事件
+        this.scroll && this.scroll.refresh()
+      },
+    },
+    watch:{
+      data(){
+        setTimeout(() => {
+          this.refresh()
+        }, 20)
+      }
+    }
+  };
+</script>
+
+<style lang="stylus" rel="stylesheet/stylus">
+</style>

@@ -1,58 +1,47 @@
 <template>
-  <div class="slider" ref="slider">
-    <div class="slider-group" ref="sliderGroup">
-      <slot>
-      </slot>
-    </div>
-    <div class="dots">
-    </div>
-  </div>
+  <swiper :options="swiperOption" ref="mySwiper">
+    <slot></slot>
+    <div class="swiper-pagination" slot="pagination"></div>
+  </swiper>
 </template>
 
 <script type="text/ecmascript-6">
-  export default {}
-
+  export default {
+    data() {
+      return {
+        swiperOption: {
+          initialSlide: 1,
+          autoplay: 2000,
+          autoplayDisableOnInteraction: false,
+          direction: 'horizontal',
+          speed: 1000,
+          loop: true,
+          pagination: '.swiper-pagination',
+          paginationClickable: true,
+          mousewheelControl: true,
+          observer: true,
+          observeParents: true,
+        }
+      };
+    },
+    computed: {
+      swiper() {
+        return this.$refs.mySwiper.swiper
+      }
+    },
+    mounted() {
+//      this.swiper.slideTo(1, 0, false);
+    },
+    activated() {
+    },
+  };
 </script>
-
-<style scoped lang="stylus" rel="stylesheet/stylus">
-  @import "~common/stylus/variable"
-
-  .slider
-    min-height: 1px
-    .slider-group
-      position: relative
-      overflow: hidden
-      white-space: nowrap
-      .slider-item
-        float: left
-        box-sizing: border-box
-        overflow: hidden
-        text-align: center
-        a
-          display: block
-          width: 100%
-          overflow: hidden
-          text-decoration: none
-        img
-          display: block
-          width: 100%
-    .dots
-      position: absolute
-      right: 0
-      left: 0
-      bottom: 12px
-      transform: translateZ(1px)
-      text-align: center
-      font-size: 0
-      .dot
-        display: inline-block
-        margin: 0 4px
-        width: 8px
-        height: 8px
-        border-radius: 50%
-        background: $color-text-l
-        &.active
-          width: 20px
-          border-radius: 5px
-          background: $color-text-ll
+<style>
+  .swiper-pagination .swiper-pagination-bullet-active {
+    opacity: 1;
+    background: rgba(255, 255, 255, 0.8);
+    width: 20px;
+    border-radius: 5px;
+    transition: all 0.5s linear;
+  }
 </style>
