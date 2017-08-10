@@ -23,6 +23,10 @@
       data: {
         type: Array,
         default: null
+      },
+      listenScroll:{
+        type:Boolean,
+        default:false
       }
     },
     mounted() {
@@ -39,6 +43,11 @@
           probeType : this.probeType,
           click : this.click,
         })
+        if(this.listenScroll){
+          this.scroll.on('scroll',(pos)=>{
+            this.$emit('scroll',pos)
+          })
+        }
       },
       enable() {//启用 better-scroll，默认开启
         this.scroll && this.scroll.enable()
@@ -52,6 +61,12 @@
       refresh() {//销毁 better-scroll，解绑事件
         this.scroll && this.scroll.refresh()
       },
+      scrollTo() {
+        this.scroll && this.scroll.scrollTo.apply(this.scroll, arguments)
+      },
+      scrollToElement() {
+        this.scroll && this.scroll.scrollToElement.apply(this.scroll, arguments)
+      }
     },
     watch:{
       data(){
