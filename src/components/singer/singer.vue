@@ -1,6 +1,7 @@
 <template>
   <div class="singer">
-    <list-view :data="singerList"></list-view>
+    <list-view @select="selectSinger" :data="singerList"></list-view>
+    <router-view></router-view>
   </div>
 </template>
 
@@ -9,6 +10,7 @@
   import {ERR_OK} from 'api/config'
   import Singer from 'common/js/singer'
   import listView from 'base/listview/listview'
+  import {mapMutations} from 'vuex'
 
   const HOT_NAME = '热门'
   const HOT_LIST_LEN = 10
@@ -18,19 +20,25 @@
         singerList: []
       }
     },
-    components:{
+    components: {
       listView
     },
     created() {
       this._getSingerList()
     },
     methods: {
+      selectSinger(singer) {//点击选择歌手详情
+        this.$router.push(
+          {path: `/singer/${singer.id}`}
+        )
+        this.setSinger(singer)
+      },
       _getSingerList() {
         getSingerList().then((res) => {
           if (res.code === ERR_OK) {
             this.singerList = this._normalizeSinger(res.data.list)
           }
-          console.log(this.singerList)
+          console.log(res.data.list)
         })
       },
       _normalizeSinger(list) {
@@ -41,7 +49,7 @@
           }
         }
         list.forEach((item, index) => {
-          if (index < HOT_LIST_LEN) {
+          if (index < HOT_LIST_LEN) {//热门人数选10个
             map.hot.items.push(new Singer({
               id: item.Fsinger_mid,
               name: item.Fsinger_name,
@@ -72,11 +80,14 @@
           }
         }
         //charCodeAt() 来获得字符串中某个具体字符的 Unicode 编码。
-        ret.sort((a,b)=>{
+        ret.sort((a, b) => {
           return a.title.charCodeAt(0) - b.title.charCodeAt(0)
         })
         return hot.concat(ret)
       },
+      ...mapMutations({
+        setSinger: 'SET_SINGER' // 映射 this.setSinger() 为 this.$store.commit('SET_SINGER')
+      })
     }
   }
 </script>

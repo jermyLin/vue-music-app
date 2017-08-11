@@ -10,7 +10,7 @@
       <li v-for="group in data" class="list-group" ref="listGroup">
         <h2 class="list-group-title">{{group.title}}</h2>
         <ul>
-          <li v-for="item in group.items" class="list-group-item">
+          <li @click="selectItem(item)" v-for="item in group.items" class="list-group-item">
             <img v-lazy="item.avatar" class="avatar">
             <span class="name">{{item.name}}</span>
           </li>
@@ -41,6 +41,7 @@
   import scroll from 'base/scroll/scroll'
   import {getData} from 'common/js/dom'
   import loading from 'base/loading/loading'
+
   const TITLE_HEIGHT = 30
   const ANCHOR_HEIGHT = 18
   export default {
@@ -56,10 +57,10 @@
     },
     data() {
       return {
-        pos_y:'',//用来判断是否为滚动到最顶部，滚动到最顶部为正值，反正负值
+        pos_y: '',//用来判断是否为滚动到最顶部，滚动到最顶部为正值，反正负值
         scrollY: 0,//歌手列表滚动的距离
         listHeight: [],//歌手列表的高度区间
-        diff:-1//用来监听固定标题栏是否重合，譬如A的标题被下个区间的B标题顶到，当值小于30且大于0的时候，标题栏开始重合
+        diff: -1//用来监听固定标题栏是否重合，譬如A的标题被下个区间的B标题顶到，当值小于30且大于0的时候，标题栏开始重合
       }
     },
     created() {
@@ -93,28 +94,28 @@
           let height1 = this.listHeight[i];
           let height2 = this.listHeight[i + 1];
           if (!height2 || (this.scrollY >= height1 && this.scrollY < height2)) {
-            this.diff = height2+this.pos_y;
+            this.diff = height2 + this.pos_y;
             return i;
           }
         }
         return 0;
       },
       fixedTitle() {
-        if(this.pos_y>=0){
+        if (this.pos_y >= 0) {
           return;
         }
-        return this.data[this.currentIndex] ? this.data[this.currentIndex].title:''
+        return this.data[this.currentIndex] ? this.data[this.currentIndex].title : ''
       },
     },
     methods: {
-      onShortCutTouchStart(e) {
+      onShortCutTouchStart(e) {//右侧字母栏点击事件
         let anchorIndex = getData(e.target, 'index')
         let firstTouch = e.touches[0]
         this.touch.y1 = firstTouch.pageY
         this.touch.anchorIndex = anchorIndex
         this._scrollTo(anchorIndex)
       },
-      onShortCutTouchMove(e) {
+      onShortCutTouchMove(e) {//右侧字母栏触摸滑动事件
         let firstTouch = e.touches[0]
         this.touch.y2 = firstTouch.pageY
         //计算触摸滑动的偏移量除以每个字母的高度。获取滚动了几个字母元素
@@ -124,10 +125,13 @@
         console.log(anchorIndex)
         this._scrollTo(anchorIndex)
       },
-      scroll(pos) {
+      scroll(pos) {//better-scroll监听的页面滚动事件
         this.pos_y = pos.y;
         this.scrollY = Math.abs(Math.round(this.pos_y));
-        console.log('this.pos_y' + this.pos_y)
+//        console.log(this.pos_y)
+      },
+      selectItem(item) {//点击选择歌手详情
+        this.$emit('select', item)
       },
       _scrollTo(index) {
         console.log(index)
