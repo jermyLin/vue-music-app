@@ -42,8 +42,8 @@
   import {getData} from 'common/js/dom'
   import loading from 'base/loading/loading'
 
-  const TITLE_HEIGHT = 30
-  const ANCHOR_HEIGHT = 18
+  const TITLE_HEIGHT = 30;
+  const ANCHOR_HEIGHT = 18;
   export default {
     props: {
       data: {
@@ -64,9 +64,9 @@
       }
     },
     created() {
-      this.touch = {}
-      this.listenScroll = true
-      this.probeType = 3
+      this.touch = {};
+      this.listenScroll = true;
+      this.probeType = 3;
     },
     watch: {
       data() {
@@ -75,11 +75,11 @@
         }, 20)
       },
       diff(newVal) {
-        let fixedTop = (newVal > 0 && newVal < TITLE_HEIGHT) ? newVal - TITLE_HEIGHT : 0
+        let fixedTop = (newVal > 0 && newVal < TITLE_HEIGHT) ? newVal - TITLE_HEIGHT : 0;
         if (this.fixedTop === fixedTop) {
           return
         }
-        this.fixedTop = fixedTop
+        this.fixedTop = fixedTop;
         this.$refs.fixed.style.transform = `translate3d(0,${fixedTop}px,0)`
       }
     },
@@ -109,20 +109,20 @@
     },
     methods: {
       onShortCutTouchStart(e) {//右侧字母栏点击事件
-        let anchorIndex = getData(e.target, 'index')
-        let firstTouch = e.touches[0]
-        this.touch.y1 = firstTouch.pageY
-        this.touch.anchorIndex = anchorIndex
+        let anchorIndex = getData(e.target, 'index');
+        let firstTouch = e.touches[0];
+        this.touch.y1 = firstTouch.pageY;
+        this.touch.anchorIndex = anchorIndex;
         this._scrollTo(anchorIndex)
       },
       onShortCutTouchMove(e) {//右侧字母栏触摸滑动事件
-        let firstTouch = e.touches[0]
-        this.touch.y2 = firstTouch.pageY
+        let firstTouch = e.touches[0];
+        this.touch.y2 = firstTouch.pageY;
         //计算触摸滑动的偏移量除以每个字母的高度。获取滚动了几个字母元素
-        let dalta = Math.floor((this.touch.y2 - this.touch.y1) / ANCHOR_HEIGHT)
+        let dalta = Math.floor((this.touch.y2 - this.touch.y1) / ANCHOR_HEIGHT);
         //计算滚动在第几个元素上的索引值
-        let anchorIndex = parseInt(this.touch.anchorIndex) + dalta
-        console.log(anchorIndex)
+        let anchorIndex = parseInt(this.touch.anchorIndex) + dalta;
+        console.log(anchorIndex);
         this._scrollTo(anchorIndex)
       },
       scroll(pos) {//better-scroll监听的页面滚动事件
@@ -134,7 +134,7 @@
         this.$emit('select', item)
       },
       _scrollTo(index) {
-        console.log(index)
+        console.log(index);
         if (!index && index !== 0) {
           return
         }
@@ -143,7 +143,7 @@
         } else if (index > this.listHeight.length - 2) {
           index = this.listHeight.length - 2
         }
-        this.scrollY = this.listHeight[index]
+        this.scrollY = this.listHeight[index];
 
         this.$refs.listview.scrollToElement(this.$refs.listGroup[index], 0)
       },

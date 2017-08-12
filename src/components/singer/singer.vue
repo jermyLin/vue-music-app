@@ -30,7 +30,7 @@
       selectSinger(singer) {//点击选择歌手详情
         this.$router.push(
           {path: `/singer/${singer.id}`}
-        )
+        );
         this.setSinger(singer)
       },
       _getSingerList() {
@@ -47,7 +47,7 @@
             title: HOT_NAME,
             items: []
           }
-        }
+        };
         list.forEach((item, index) => {
           if (index < HOT_LIST_LEN) {//热门人数选10个
             map.hot.items.push(new Singer({
@@ -55,7 +55,7 @@
               name: item.Fsinger_name,
             }))
           }
-          const key = item.Findex
+          const key = item.Findex;
           if (!map[key]) {
             map[key] = {
               title: key,
@@ -66,8 +66,8 @@
             id: item.Fsinger_mid,
             name: item.Fsinger_name,
           }))
-        })
-        console.log(map)
+        });
+        console.log(map);
         //为了得到有序列表。把对象map转换成数组
         let hot = [];
         let ret = [];
@@ -82,7 +82,7 @@
         //charCodeAt() 来获得字符串中某个具体字符的 Unicode 编码。
         ret.sort((a, b) => {
           return a.title.charCodeAt(0) - b.title.charCodeAt(0)
-        })
+        });
         return hot.concat(ret)
       },
       ...mapMutations({
