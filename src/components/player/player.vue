@@ -1,60 +1,65 @@
 <template>
   <div class="player" v-show="playList.length>0">
-    <transition name="normal">
+    <transition name="normal"
+                @enter="enter"
+                @after-enter="afterEnter"
+                @leave="leave"
+                @after-leave="afterLeave"
+    >
       <div class="normal-player" v-show="fullScreen">
         <div class="background">
-          <img width="100%" height="100%">
+          <img width="100%" height="100%" :src="currentSong.image">
         </div>
         <div class="top">
-          <div class="back">
+          <div class="back" @click="hidePlayer">
             <i class="icon-back"></i>
           </div>
-          <h1 class="title"></h1>
-          <h2 class="subtitle"></h2>
+          <h1 class="title" v-html="currentSong.name"></h1>
+          <h2 class="subtitle" v-html="currentSong.singer"></h2>
         </div>
         <div class="middle">
           <div class="middle-l" ref="middleL">
             <div class="cd-wrapper" ref="cdWrapper">
-              <div class="cd">
-                <img class="image">
+              <div class="cd" :class="cdCls">
+                <img class="image" :src="currentSong.image">
               </div>
             </div>
             <!--<div class="playing-lyric-wrapper">-->
-              <!--<div class="playing-lyric">{{playingLyric}}</div>-->
+            <!--<div class="playing-lyric">{{playingLyric}}</div>-->
             <!--</div>-->
           </div>
           <!--<scroll class="middle-r" ref="lyricList" :data="currentLyric && currentLyric.lines">-->
-            <!--<div class="lyric-wrapper">-->
-              <!--<div v-if="currentLyric">-->
-                <!--<p ref="lyricLine"-->
-                   <!--class="text"-->
-                   <!--:class="{'current': currentLineNum ===index}"-->
-                   <!--v-for="(line,index) in currentLyric.lines">{{line.txt}}</p>-->
-              <!--</div>-->
-            <!--</div>-->
+          <!--<div class="lyric-wrapper">-->
+          <!--<div v-if="currentLyric">-->
+          <!--<p ref="lyricLine"-->
+          <!--class="text"-->
+          <!--:class="{'current': currentLineNum ===index}"-->
+          <!--v-for="(line,index) in currentLyric.lines">{{line.txt}}</p>-->
+          <!--</div>-->
+          <!--</div>-->
           <!--</scroll>-->
         </div>
         <div class="bottom">
           <!--<div class="dot-wrapper">-->
-            <!--<span class="dot" :class="{'active':currentShow==='cd'}"></span>-->
-            <!--<span class="dot" :class="{'active':currentShow==='lyric'}"></span>-->
+          <!--<span class="dot" :class="{'active':currentShow==='cd'}"></span>-->
+          <!--<span class="dot" :class="{'active':currentShow==='lyric'}"></span>-->
           <!--</div>-->
           <!--<div class="progress-wrapper">-->
-            <!--<span class="time time-l">{{format(currentTime)}}</span>-->
-            <!--<div class="progress-bar-wrapper">-->
-              <!--<progress-bar :percent="percent" @percentChange="onProgressBarChange"></progress-bar>-->
-            <!--</div>-->
-            <!--<span class="time time-r">{{format(currentSong.duration)}}</span>-->
+          <!--<span class="time time-l">{{format(currentTime)}}</span>-->
+          <!--<div class="progress-bar-wrapper">-->
+          <!--<progress-bar :percent="percent" @percentChange="onProgressBarChange"></progress-bar>-->
+          <!--</div>-->
+          <!--<span class="time time-r">{{format(currentSong.duration)}}</span>-->
           <!--</div>-->
           <div class="operators">
             <div class="icon i-left">
-              <i></i>
+              <i class="icon-sequence"></i>
             </div>
             <div class="icon i-left">
               <i class="icon-prev"></i>
             </div>
             <div class="icon i-center">
-              <i></i>
+              <i @click="togglePlaying" :class="playIcon"></i>
             </div>
             <div class="icon i-right">
               <i class="icon-next"></i>
@@ -67,17 +72,18 @@
       </div>
     </transition>
     <transition name="mini">
-      <div class="mini-player" v-show="!fullScreen">
+      <div class="mini-player" v-show="!fullScreen" @click="openPlayer">
         <div class="icon">
-          <img width="40" height="40">
+          <img :class="cdCls" width="40" height="40" :src="currentSong.image">
         </div>
         <div class="text">
-          <h2 class="name"></h2>
-          <p class="desc"></p>
+          <h2 class="name" v-html="currentSong.name"></h2>
+          <p class="desc" v-html="currentSong.singer"></p>
         </div>
         <div class="control">
+          <i @click.stop.prevent="togglePlaying"  :class="miniIcon"></i>
           <!--<progress-circle :radius="radius" :percent="percent">-->
-            <!--<i @click.stop="togglePlaying" class="icon-mini" :class="miniIcon"></i>-->
+          <!--<i @click.stop="togglePlaying" class="icon-mini" :class="miniIcon"></i>-->
           <!--</progress-circle>-->
         </div>
         <div class="control">
@@ -85,20 +91,116 @@
         </div>
       </div>
     </transition>
-    <!--<audio ref="audio" :src="currentSong.url" @canplay="ready" @error="error" @timeupdate="updateTime"-->
-           <!--@ended="end"></audio>-->
+    <audio ref="audio" :src="currentSong.url"></audio>
   </div>
 </template>
 
 <script type="text/ecmascript-6">
-  import {mapGetters} from 'vuex'
+  import {mapGetters, mapMutations} from 'vuex'
+  import animations from 'create-keyframe-animation'
+  import {prefixStyle} from 'common/js/dom'
+
+  const transform = prefixStyle('transform')
+  const transitionDuration = prefixStyle('transitionDuration')
 
   export default {
     computed: {
       ...mapGetters([
         'fullScreen',
-        'playList'
-      ])
+        'playList',
+        'currentSong',
+        'playing'
+      ]),
+      playIcon() {
+        return this.playing ? 'icon-pause' : 'icon-play'
+      },
+      miniIcon() {
+        return this.playing ? 'icon-pause-mini' : 'icon-play-mini'
+      },
+      cdCls() {
+        return this.playing ? 'play' : 'play pause'
+      }
+    },
+    methods: {
+      ...mapMutations({
+        setFullScreen: 'SET_FULL_SCREEN',
+        setPlayingState: 'SET_PLAYING_STATE'
+      }),
+      hidePlayer() {//隐藏播放器
+        this.setFullScreen(false)
+      },
+      openPlayer() {
+        this.setFullScreen(true)
+      },
+      togglePlaying() {
+        this.setPlayingState(!this.playing)
+      },
+      enter(el, done) {
+        const {x, y, scale} = this._getPosAndScale()
+        let animation = {
+          0: {
+            transform: `translate3d(${x}px,${y}px,0) scale(${scale})`
+          },
+          60: {
+            transform: `translate3d(0,0,0) scale(1.1)`
+          },
+          100: {
+            transform: `translate3d(0,0,0) scale(1)`
+          }
+        };
+        animations.registerAnimation({
+          name: 'move',
+          animation,
+          presets: {
+            duration: 400,
+            easing: 'linear'
+          }
+        });
+        animations.runAnimation(this.$refs.cdWrapper, 'move', done)
+      },
+      afterEnter() {
+        animations.unregisterAnimation('move')
+        this.$refs.cdWrapper.style.animation = ''
+      },
+      leave(el, done) {
+        this.$refs.cdWrapper.style.transition = 'all 0.4s'
+        const {x, y, scale} = this._getPosAndScale()
+        this.$refs.cdWrapper.style[transform] = `translate3d(${x}px,${y}px,0) scale(${scale})`
+        this.$refs.cdWrapper.addEventListener('transitionend', done)
+      },
+      afterLeave() {
+        this.$refs.cdWrapper.style.transition = ''
+        this.$refs.cdWrapper.style[transform] = ''
+      },
+      _getPosAndScale() {
+        const targetWidth = 40
+        const paddingLeft = 40
+        const paddingBottom = 30
+        const paddingTop = 80
+        const width = window.innerWidth * 0.8
+        const scale = targetWidth / width
+        const x = -(window.innerWidth / 2 - paddingLeft)
+        const y = window.innerHeight - paddingTop - width / 2 - paddingBottom
+        return {
+          x,
+          y,
+          scale
+        }
+      },
+    },
+    watch:{
+      currentSong() {
+        this.$nextTick(()=>{
+          this.$refs.audio.play()
+        })
+      },
+      playing(newPlaying) {
+        let audio = this.$refs.audio
+        this.$nextTick(()=>{
+          newPlaying ? audio.play(): audio.pause()
+        })
+
+      },
     }
   }
 </script>
