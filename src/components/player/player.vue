@@ -88,8 +88,11 @@
           <p class="desc" v-html="currentSong.singer"></p>
         </div>
         <div class="control">
-          <i @click.stop.prevent="togglePlaying" :class="miniIcon"></i>
-          <!--<progress-circle :radius="radius" :percent="percent">-->
+          <progress-circle :radius="radius" :percent="percent">
+            <i @click.stop.prevent="togglePlaying" class="icon-mini" :class="miniIcon"></i>
+          </progress-circle>
+
+          <!--<progress-circle  :percent="percent">-->
           <!--<i @click.stop="togglePlaying" class="icon-mini" :class="miniIcon"></i>-->
           <!--</progress-circle>-->
         </div>
@@ -112,6 +115,7 @@
   import animations from 'create-keyframe-animation'
   import {prefixStyle} from 'common/js/dom'
   import progressBar from 'base/progress-bar/progress-bar'
+  import progressCircle from 'base/progress-circle/progress-circle'
 
   const transform = prefixStyle('transform')
   const transitionDuration = prefixStyle('transitionDuration')
@@ -120,11 +124,13 @@
     data() {
       return {
         songReady: false,
-        currentTime: 0
+        currentTime: 0,
+        radius:32
       }
     },
     components:{
-      progressBar
+      progressBar,
+      progressCircle
     },
     computed: {
       ...mapGetters([
