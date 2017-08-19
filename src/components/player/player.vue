@@ -59,8 +59,8 @@
             <span class="time time-r">{{format(currentSong.duration)}}</span>
           </div>
           <div class="operators">
-            <div class="icon i-left">
-              <i class="icon-sequence"></i>
+            <div class="icon i-left" @click="changeMode">
+              <i :class="iconMode"></i>
             </div>
             <div class="icon i-left" :class="disableCls">
               <i @click="prevSong" class="icon-prev"></i>
@@ -116,6 +116,8 @@
   import {prefixStyle} from 'common/js/dom'
   import progressBar from 'base/progress-bar/progress-bar'
   import progressCircle from 'base/progress-circle/progress-circle'
+  import {playMode} from 'common/js/config'
+  import {shuffle} from 'common/js/util'
 
   const transform = prefixStyle('transform')
   const transitionDuration = prefixStyle('transitionDuration')
@@ -125,10 +127,10 @@
       return {
         songReady: false,
         currentTime: 0,
-        radius:32
+        radius: 32
       }
     },
-    components:{
+    components: {
       progressBar,
       progressCircle
     },
@@ -138,7 +140,9 @@
         'playList',
         'currentSong',
         'playing',
-        'currentIndex'
+        'currentIndex',
+        'mode',
+        'sequenceList'
       ]),
       playIcon() {
         return this.playing ? 'icon-pause' : 'icon-play'
@@ -154,13 +158,19 @@
       },
       percent() {
         return this.currentTime / this.currentSong.duration
-      }
+      },
+      iconMode() {
+        return this.mode === playMode.sequence ? 'icon-sequence' :
+          this.mode === playMode.loop ? 'icon-loop' : 'icon-random'
+      },
     },
     methods: {
       ...mapMutations({
         setFullScreen: 'SET_FULL_SCREEN',
         setPlayingState: 'SET_PLAYING_STATE',
-        setCurrentIndex: 'SET_CURRENT_INDEX'
+        setCurrentIndex: 'SET_CURRENT_INDEX',
+        setPlayMode: 'SET_PLAY_MODE',
+        setPlayList: 'SET_PLAYLIST'
       }),
       hidePlayer() {//隐藏播放器
         this.setFullScreen(false)
@@ -217,9 +227,27 @@
       },
       onProgressBarChange(percent) {
         this.$refs.audio.currentTime = this.currentSong.duration * percent
-        if(!this.playing) {
+        if (!this.playing) {
           this.togglePlaying()
         }
+      },
+      changeMode() {
+        const mode = (this.mode + 1) % 3
+        this.setPlayMode(mode)
+        let list = null
+        if (mode === playMode.random) {
+          list = shuffle(this.sequenceList)
+        } else {
+          list = this.sequenceList
+        }
+        this.resetCurrentIndex(list)
+        this.setPlayList(list)
+      },
+      resetCurrentIndex(list) {
+        let index = list.findIndex((item) => {
+          return item.id === this.currentSong.id
+        })
+        this.setCurrentIndex(index)
       },
       enter(el, done) {
         const {x, y, scale} = this._getPosAndScale()
@@ -275,7 +303,10 @@
       },
     },
     watch: {
-      currentSong() {
+      currentSong(newSong,oldSong) {
+        if (newSong.id === oldSong.id) {
+          return
+        }
         this.$nextTick(() => {
           this.$refs.audio.play()
         })
