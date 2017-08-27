@@ -3,9 +3,9 @@
     <div class="bar-inner">
       <div class="progress" ref="progress"></div>
       <div class="progress-btn-wrapper" ref="progressBtn"
-      @touchstart.prevent="progressTouchStart"
-      @touchmove.prevent="progressTouchMove"
-      @touchend="progressTouchEnd"
+           @touchstart.prevent="progressTouchStart"
+           @touchmove.prevent="progressTouchMove"
+           @touchend="progressTouchEnd"
       >
         <div class="progress-btn"></div>
       </div>
@@ -50,8 +50,13 @@
         this._triggerPercent()
       },
       progressClick(e) {
-        console.log(e)
-        this._offset(e.offsetX)
+//        const rect = this.$refs.progressBar.getBoundingClientRect()
+//        console.log(rect.left)
+//        console.log(this.$refs.progressBar.offsetLeft)
+        const offsetWidth = e.pageX - this.$refs.progressBar.offsetLeft
+        this._offset(offsetWidth)
+        // 这里当我们点击 progressBtn 的时候，e.offsetX 获取不对
+        // this._offset(e.offsetX)
         this._triggerPercent()
       },
       _triggerPercent() {

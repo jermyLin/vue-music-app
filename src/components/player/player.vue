@@ -106,6 +106,7 @@
            @canplay="readySong"
            @error="errorSong"
            @timeupdate="updateTime"
+           @ended="endSong"
     ></audio>
   </div>
 </template>
@@ -218,6 +219,17 @@
       updateTime(e) {
         this.currentTime = e.target.currentTime
       },
+      endSong() {
+        if(this.mode === playMode.loop) {//判断是否为单曲循环
+          this.loop()
+        }else{
+          this.nextSong()
+        }
+      },
+      loop() {
+        this.$refs.audio.currentTime = 0
+        this.$refs.audio.play()
+      },
       format(time) {
         time = Math.floor(time)
         let minutes = Math.floor(time / 60)
@@ -236,7 +248,7 @@
         this.setPlayMode(mode)
         let list = null
         if (mode === playMode.random) {
-          list = shuffle(this.sequenceList)
+          list =  (this.sequenceList)
         } else {
           list = this.sequenceList
         }
