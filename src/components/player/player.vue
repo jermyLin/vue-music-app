@@ -28,16 +28,16 @@
             <!--<div class="playing-lyric">{{playingLyric}}</div>-->
             <!--</div>-->
           </div>
-          <!--<scroll class="middle-r" ref="lyricList" :data="currentLyric && currentLyric.lines">-->
-          <!--<div class="lyric-wrapper">-->
-          <!--<div v-if="currentLyric">-->
-          <!--<p ref="lyricLine"-->
-          <!--class="text"-->
-          <!--:class="{'current': currentLineNum ===index}"-->
-          <!--v-for="(line,index) in currentLyric.lines">{{line.txt}}</p>-->
-          <!--</div>-->
-          <!--</div>-->
-          <!--</scroll>-->
+          <scroll class="middle-r" ref="lyricList" :data=" currentLyric && currentLyric.lines">
+            <div class="lyric-wrapper">
+              <div v-if="currentLyric">
+                <p ref="lyricLine"
+                   class="text"
+                   :class="{current : currentLineNum === index}"
+                   v-for="(line,index) in currentLyric.lines">{{line.txt}}</p>
+              </div>
+            </div>
+          </scroll>
         </div>
         <div class="bottom">
           <!--<div class="dot-wrapper">-->
@@ -112,28 +112,33 @@
 </template>
 
 <script type="text/ecmascript-6">
-  import {mapGetters, mapMutations} from 'vuex'
+  import { mapGetters, mapMutations } from 'vuex'
   import animations from 'create-keyframe-animation'
-  import {prefixStyle} from 'common/js/dom'
+  import { prefixStyle } from 'common/js/dom'
   import progressBar from 'base/progress-bar/progress-bar'
   import progressCircle from 'base/progress-circle/progress-circle'
-  import {playMode} from 'common/js/config'
-  import {shuffle} from 'common/js/util'
+  import { playMode } from 'common/js/config'
+  import { shuffle } from 'common/js/util'
+  import Lyric from 'lyric-parser'
+  import Scroll from 'base/scroll/scroll'
 
   const transform = prefixStyle('transform')
   const transitionDuration = prefixStyle('transitionDuration')
 
   export default {
-    data() {
+    data () {
       return {
         songReady: false,
         currentTime: 0,
-        radius: 32
+        radius: 32,
+        currentLyric: null,
+        currentLineNum: 0
       }
     },
     components: {
       progressBar,
-      progressCircle
+      progressCircle,
+      Scroll
     },
     computed: {
       ...mapGetters([
@@ -145,24 +150,23 @@
         'mode',
         'sequenceList'
       ]),
-      playIcon() {
+      playIcon () {
         return this.playing ? 'icon-pause' : 'icon-play'
       },
-      miniIcon() {
+      miniIcon () {
         return this.playing ? 'icon-pause-mini' : 'icon-play-mini'
       },
-      cdCls() {
+      cdCls () {
         return this.playing ? 'play' : 'play pause'
       },
-      disableCls() {
+      disableCls () {
         return this.songReady ? '' : 'disable'
       },
-      percent() {
+      percent () {
         return this.currentTime / this.currentSong.duration
       },
-      iconMode() {
-        return this.mode === playMode.sequence ? 'icon-sequence' :
-          this.mode === playMode.loop ? 'icon-loop' : 'icon-random'
+      iconMode () {
+        return this.mode === playMode.sequence ? 'icon-sequence' : this.mode === playMode.loop ? 'icon-loop' : 'icon-random'
       },
     },
     methods: {
@@ -173,16 +177,16 @@
         setPlayMode: 'SET_PLAY_MODE',
         setPlayList: 'SET_PLAYLIST'
       }),
-      hidePlayer() {//隐藏播放器
+      hidePlayer () {//隐藏播放器
         this.setFullScreen(false)
       },
-      openPlayer() {
+      openPlayer () {
         this.setFullScreen(true)
       },
-      togglePlaying() {
+      togglePlaying () {
         this.setPlayingState(!this.playing)
       },
-      nextSong() {
+      nextSong () {
         if (!this.songReady) {
           return
         }
@@ -196,7 +200,7 @@
           this.togglePlaying()
         }
       },
-      prevSong() {
+      prevSong () {
         if (!this.songReady) {
           return
         }
@@ -210,58 +214,77 @@
           this.togglePlaying()
         }
       },
-      readySong() {
+      readySong () {
         this.songReady = true
       },
-      errorSong() {
+      errorSong () {
         this.songReady = true
       },
-      updateTime(e) {
+      updateTime (e) {
         this.currentTime = e.target.currentTime
       },
-      endSong() {
-        if(this.mode === playMode.loop) {//判断是否为单曲循环
+      endSong () {
+        if (this.mode === playMode.loop) {//判断是否为单曲循环
           this.loop()
-        }else{
+        } else {
           this.nextSong()
         }
       },
-      loop() {
+      loop () {
         this.$refs.audio.currentTime = 0
         this.$refs.audio.play()
       },
-      format(time) {
+      format (time) {
         time = Math.floor(time)
         let minutes = Math.floor(time / 60)
         let second = Math.floor(time % 60)
         second = second < 10 ? `0${second}` : second
         return `${minutes}:${second}`
       },
-      onProgressBarChange(percent) {
+      onProgressBarChange (percent) {
         this.$refs.audio.currentTime = this.currentSong.duration * percent
         if (!this.playing) {
           this.togglePlaying()
         }
       },
-      changeMode() {
+      changeMode () {
         const mode = (this.mode + 1) % 3
         this.setPlayMode(mode)
         let list = null
         if (mode === playMode.random) {
-          list =  (this.sequenceList)
+          list = (this.sequenceList)
         } else {
           list = this.sequenceList
         }
         this.resetCurrentIndex(list)
         this.setPlayList(list)
       },
-      resetCurrentIndex(list) {
+      resetCurrentIndex (list) {
         let index = list.findIndex((item) => {
           return item.id === this.currentSong.id
         })
         this.setCurrentIndex(index)
       },
-      enter(el, done) {
+      _getLyric () {
+        this.currentSong.getLyric().then((lyric) => {
+          this.currentLyric = new Lyric(lyric, this.handleLyric)
+          if (this.playing) {
+            this.currentLyric.play()
+          }
+          console.log(this.currentLyric)
+        })
+      },
+      handleLyric ({lineNum, txt}) {
+        this.currentLineNum = lineNum
+        if (lineNum > 5) {
+          console.log(lineNum)
+          let lineEl = this.$refs.lyricLine[lineNum - 5]
+          this.$refs.lyricList.scrollToElement(lineEl, 1000)
+        } else {
+          this.$refs.lyricList.scrollToElement(0, 0, 1000)
+        }
+      },
+      enter (el, done) {
         const {x, y, scale} = this._getPosAndScale()
         let animation = {
           0: {
@@ -273,7 +296,7 @@
           100: {
             transform: `translate3d(0,0,0) scale(1)`
           }
-        };
+        }
         animations.registerAnimation({
           name: 'move',
           animation,
@@ -281,24 +304,24 @@
             duration: 400,
             easing: 'linear'
           }
-        });
+        })
         animations.runAnimation(this.$refs.cdWrapper, 'move', done)
       },
-      afterEnter() {
+      afterEnter () {
         animations.unregisterAnimation('move')
         this.$refs.cdWrapper.style.animation = ''
       },
-      leave(el, done) {
+      leave (el, done) {
         this.$refs.cdWrapper.style.transition = 'all 0.4s'
         const {x, y, scale} = this._getPosAndScale()
         this.$refs.cdWrapper.style[transform] = `translate3d(${x}px,${y}px,0) scale(${scale})`
         this.$refs.cdWrapper.addEventListener('transitionend', done)
       },
-      afterLeave() {
+      afterLeave () {
         this.$refs.cdWrapper.style.transition = ''
         this.$refs.cdWrapper.style[transform] = ''
       },
-      _getPosAndScale() {
+      _getPosAndScale () {
         const targetWidth = 40
         const paddingLeft = 40
         const paddingBottom = 30
@@ -315,15 +338,16 @@
       },
     },
     watch: {
-      currentSong(newSong,oldSong) {
+      currentSong (newSong, oldSong) {
         if (newSong.id === oldSong.id) {
           return
         }
         this.$nextTick(() => {
           this.$refs.audio.play()
+          this._getLyric()
         })
       },
-      playing(newPlaying) {
+      playing (newPlaying) {
         let audio = this.$refs.audio
         this.$nextTick(() => {
           newPlaying ? audio.play() : audio.pause()
