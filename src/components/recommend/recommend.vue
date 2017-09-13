@@ -16,7 +16,7 @@
         <div class="recommend-list">
           <h1 class="list-title">热门歌单推荐</h1>
           <ul>
-            <li v-for="item in discList" class="item">
+            <li v-for="item in discList" class="item" :key="item.imgurl">
               <div class="icon">
                 <img width="60" height="60" v-lazy="item.imgurl" alt="">
               </div>
@@ -44,6 +44,7 @@
   import loading from 'base/loading/loading'
 
   export default {
+    name:'recommend',
     components: {
       swiper,
       swiperSlide,

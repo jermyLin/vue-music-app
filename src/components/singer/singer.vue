@@ -26,6 +26,10 @@
     created() {
       this._getSingerList()
     },
+    activated() {
+      //当引入keep-alive 的时候，页面第一次进入，钩子的触发顺序created-> mounted-> activated，退出时触发deactivated。当再次进入（前进或者后退）时，只触发activated。
+       console.log(this.$route.query)
+    },
     methods: {
       selectSinger(singer) {//点击选择歌手详情
         this.$router.push(

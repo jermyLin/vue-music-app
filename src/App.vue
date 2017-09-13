@@ -2,7 +2,7 @@
   <div id="app">
     <m-header></m-header>
     <tab></tab>
-    <keep-alive>
+    <keep-alive exclude="recommend">
       <router-view></router-view>
     </keep-alive>
     <player></player>
