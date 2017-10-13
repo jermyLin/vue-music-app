@@ -176,10 +176,10 @@ export default {
     openPlayer() {
       this.setFullScreen(true)
     },
-    togglePlaying() {
+    togglePlaying() {//音乐播放开关
       this.setPlayingState(!this.playing)
     },
-    nextSong() {
+    nextSong() {//切换下一首歌曲
       if (!this.songReady) {
         return
       }
@@ -193,7 +193,7 @@ export default {
         this.togglePlaying()
       }
     },
-    prevSong() {
+    prevSong() {//切换上一首歌曲
       if (!this.songReady) {
         return
       }
@@ -234,13 +234,13 @@ export default {
       second = second < 10 ? `0${second}` : second
       return `${minutes}:${second}`
     },
-    onProgressBarChange(percent) {
+    onProgressBarChange(percent) {//音乐播放进度条改变
       this.$refs.audio.currentTime = this.currentSong.duration * percent
       if (!this.playing) {
         this.togglePlaying()
       }
     },
-    changeMode() {
+    changeMode() {//改变播放模式
       const mode = (this.mode + 1) % 3
       this.setPlayMode(mode)
       let list = null
@@ -338,7 +338,6 @@ export default {
       if (!this.touch.initiated) {
         return;
       }
-
       const touch = e.touches[0];
       const daltaX = touch.pageX - this.touch.startX;
       const daltaY = touch.pageY - this.touch.startY;
@@ -347,28 +346,37 @@ export default {
       }
       const left = this.currentShow === 'cd' ? 0 : -window.innerWidth;
       const offsetWidth = Math.min(Math.max(-window.innerWidth, left + daltaX), 0);
-      console.log(this.touch)
-      this.touch.percent = Math.abs(offsetWidth / window.innerWidth)
-      this.$refs.lyricList.$el.style[transform] = `translate3d(${offsetWidth}px,0,0)`
+      this.touch.percent = Math.abs(offsetWidth / window.innerWidth);
+      this.$refs.lyricList.$el.style[transform] = `translate3d(${offsetWidth}px,0,0)`;
+      this.$refs.middleL.style.opacity = 1 - this.touch.percent;
     },
     middleTouchEnd() {
       let offsetWidth;
+      let opacity;
       if (this.currentShow === 'cd') {
         if (this.touch.percent > 0.1) {
           offsetWidth = -window.innerWidth;
+          opacity = 0;
           this.currentShow = 'lyric'
         } else {
           offsetWidth = 0;
+          opacity = 1;
         }
       }else {
         if(this.touch.percent < 0.9) {
           offsetWidth = 0;
+          opacity = 1;
           this.currentShow = 'cd'
         }else {
           offsetWidth = -window.innerWidth;
+          opacity = 0;
         }
       }
-      this.$refs.lyricList.$el.style[transform] = `translate3d(${offsetWidth}px,0,0)`
+      const time = 300;
+      this.$refs.lyricList.$el.style[transform] = `translate3d(${offsetWidth}px,0,0)`;
+      this.$refs.lyricList.$el.style[transitionDuration] = `${time}ms`;
+      this.$refs.middleL.style.opacity = opacity;
+      this.$refs.middleL.style[transitionDuration] = `${time}ms`;
     },
   },
   watch: {
@@ -381,7 +389,7 @@ export default {
         this._getLyric()
       })
     },
-    playing(newPlaying) {
+    playing(newPlaying) {//监听音乐播放
       let audio = this.$refs.audio
       this.$nextTick(() => {
         newPlaying ? audio.play() : audio.pause()
