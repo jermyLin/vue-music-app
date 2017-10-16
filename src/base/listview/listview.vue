@@ -109,6 +109,9 @@
       },
     },
     methods: {
+      refresh() {
+        this.$refs.listview.refresh()
+      },
       onShortCutTouchStart(e) {//右侧字母栏点击事件
         let anchorIndex = getData(e.target, 'index');
         let firstTouch = e.touches[0];

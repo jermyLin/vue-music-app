@@ -42,8 +42,10 @@
   import slider from 'base/slider/slider'
   import scroll from 'base/scroll/scroll'
   import loading from 'base/loading/loading'
+  import {playlistMixin} from 'common/js/mixin'
 
   export default {
+    mixins: [playlistMixin],
     name:'recommend',
     components: {
       swiper,
@@ -63,6 +65,11 @@
       this._getDiscList()
     },
     methods: {
+      handlePlaylist(playList) {
+        const bottom = playList.length > 0 ? '60px' : ''
+        this.$refs.recommend.style.bottom = bottom
+        this.$refs.scroll.refresh()
+      },
       _getRecommend() {
         getRecommend().then((res) => {
           if (res.code === ERR_OK) {

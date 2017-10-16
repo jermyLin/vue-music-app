@@ -19,9 +19,9 @@
                 <img class="image" :src="currentSong.image">
               </div>
             </div>
-            <!--<div class="playing-lyric-wrapper">-->
-            <!--<div class="playing-lyric">{{playingLyric}}</div>-->
-            <!--</div>-->
+            <div class="playing-lyric-wrapper">
+              <div class="playing-lyric">{{playingLyric}}</div>
+            </div>
           </div>
           <scroll class="middle-r" ref="lyricList" :data=" currentLyric && currentLyric.lines">
             <div class="lyric-wrapper">
@@ -37,15 +37,15 @@
             <span class="dot" :class="{ active : currentShow === 'cd' }"></span>
             <span class="dot" :class="{ active : currentShow === 'lyric' }"></span>
             <!-- <span class="dot" :class="{'active':currentShow==='cd'}"></span>
-                                        <span class="dot" :class="{'active':currentShow==='lyric'}"></span> -->
+                                                        <span class="dot" :class="{'active':currentShow==='lyric'}"></span> -->
           </div>
           <!-- <div class="progress-wrapper">
-                                        <span class="time time-l">{{format(currentTime)}}</span>
-                                        <div class="progress-bar-wrapper">
-                                          <progress-bar :percent="percent" @percentChange="onProgressBarChange"></progress-bar>
-                                        </div>
-                                        <span class="time time-r">{{format(currentSong.duration)}}</span>
-                                      </div> -->
+                                                        <span class="time time-l">{{format(currentTime)}}</span>
+                                                        <div class="progress-bar-wrapper">
+                                                          <progress-bar :percent="percent" @percentChange="onProgressBarChange"></progress-bar>
+                                                        </div>
+                                                        <span class="time time-r">{{format(currentSong.duration)}}</span>
+                                                      </div> -->
           <div class="progress-wrapper">
             <span class="time time-l">{{format(currentTime)}}</span>
             <div class="progress-bar-wrapper">
@@ -122,7 +122,8 @@ export default {
       radius: 32,
       currentLyric: null,
       currentLineNum: 0,
-      currentShow: 'cd'
+      currentShow: 'cd',
+      playingLyric: ''
     }
   },
   components: {
@@ -178,34 +179,45 @@ export default {
     },
     togglePlaying() {//音乐播放开关
       this.setPlayingState(!this.playing)
+      if (this.currentLyric) {
+        this.currentLyric.togglePlay()
+      }
     },
     nextSong() {//切换下一首歌曲
       if (!this.songReady) {
         return
       }
-      let index = this.currentIndex + 1
-      if (index === this.playList.length) {
-        index = 0
+      if (this.playList.length === 1) {//当歌曲列表只有一首歌的时候就单曲播放
+        this.loop()
+      } else {
+        let index = this.currentIndex + 1
+        if (index === this.playList.length) {
+          index = 0
+        }
+        this.setCurrentIndex(index)
+        if (!this.playing) {
+          this.togglePlaying()
+        }
       }
-      this.setCurrentIndex(index)
       this.songReady = false
-      if (!this.playing) {
-        this.togglePlaying()
-      }
     },
     prevSong() {//切换上一首歌曲
       if (!this.songReady) {
         return
       }
-      let index = this.currentIndex - 1
-      if (index === -1) {
-        index = this.playList.length - 1
+      if (this.playList.length === 1) {//当歌曲列表只有一首歌的时候就单曲播放
+        this.loop()
+      } else {
+        let index = this.currentIndex - 1
+        if (index === -1) {
+          index = this.playList.length - 1
+        }
+        this.setCurrentIndex(index)
+        if (!this.playing) {
+          this.togglePlaying()
+        }
       }
-      this.setCurrentIndex(index)
       this.songReady = false
-      if (!this.playing) {
-        this.togglePlaying()
-      }
     },
     readySong() {
       this.songReady = true
@@ -235,9 +247,13 @@ export default {
       return `${minutes}:${second}`
     },
     onProgressBarChange(percent) {//音乐播放进度条改变
-      this.$refs.audio.currentTime = this.currentSong.duration * percent
+      const currentTime = this.currentSong.duration * percent;
+      this.$refs.audio.currentTime = currentTime;
       if (!this.playing) {
         this.togglePlaying()
+      }
+      if (this.currentLyric) {
+        this.currentLyric.seek(currentTime * 1000)
       }
     },
     changeMode() {//改变播放模式
@@ -258,13 +274,16 @@ export default {
       })
       this.setCurrentIndex(index)
     },
-    _getLyric() {
+    _getLyric() {//获取歌词列表
       this.currentSong.getLyric().then((lyric) => {
         this.currentLyric = new Lyric(lyric, this.handleLyric)
         if (this.playing) {
           this.currentLyric.play()
         }
-        console.log(this.currentLyric)
+      }).catch(() => {//当获取不到歌词时
+        this.currentLyric = null
+        this.currentLineNum = 0
+        this.playingLyric = ''
       })
     },
     handleLyric({ lineNum, txt }) {
@@ -275,6 +294,7 @@ export default {
       } else {
         this.$refs.lyricList.scrollToElement(0, 0, 1000)
       }
+      this.playingLyric = txt
     },
     enter(el, done) {
       const { x, y, scale } = this._getPosAndScale()
@@ -362,12 +382,12 @@ export default {
           offsetWidth = 0;
           opacity = 1;
         }
-      }else {
-        if(this.touch.percent < 0.9) {
+      } else {
+        if (this.touch.percent < 0.9) {
           offsetWidth = 0;
           opacity = 1;
           this.currentShow = 'cd'
-        }else {
+        } else {
           offsetWidth = -window.innerWidth;
           opacity = 0;
         }
@@ -384,10 +404,15 @@ export default {
       if (newSong.id === oldSong.id) {
         return
       }
-      this.$nextTick(() => {
-        this.$refs.audio.play()
-        this._getLyric()
-      })
+      if (this.currentLyric) {
+        this.currentLyric.stop()
+      }
+      setTimeout(() => {
+        this.$nextTick(() => {
+          this.$refs.audio.play()
+          this._getLyric()
+        })
+      }, 1000)
     },
     playing(newPlaying) {//监听音乐播放
       let audio = this.$refs.audio
