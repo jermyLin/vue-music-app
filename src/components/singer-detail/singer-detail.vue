@@ -38,7 +38,7 @@
       ...mapGetters([
         'singer'
       ])
-      //...mapGetters语法糖等价于下面singer方法
+      // ...mapGetters语法糖等价于下面singer方法
 //      singer() {
 //       return this.$store.getters.singer
 //      }

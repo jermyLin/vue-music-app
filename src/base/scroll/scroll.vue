@@ -24,58 +24,57 @@
         type: Array,
         default: null
       },
-      listenScroll:{
-        type:Boolean,
-        default:false
+      listenScroll: {
+        type: Boolean,
+        default: false
       }
     },
-    mounted() {
+    mounted () {
       setTimeout(() => {
         this._initScroll()
       }, 20)
     },
     methods: {
-      _initScroll() {
-        if(!this.$refs.wrapper){
+      _initScroll () {
+        if (!this.$refs.wrapper) {
           return
         }
-        this.scroll = new BScroll(this.$refs.wrapper,{
-          probeType : this.probeType,
-          click : this.click,
+        this.scroll = new BScroll(this.$refs.wrapper, {
+          probeType: this.probeType,
+          click: this.click
         })
-        if(this.listenScroll){
-          this.scroll.on('scroll',(pos)=>{
-            this.$emit('scroll',pos)
+        if (this.listenScroll) {
+          this.scroll.on('scroll', (pos) => {
+            this.$emit('scroll', pos)
           })
         }
       },
-      enable() {//启用 better-scroll，默认开启
+      enable () { // 启用 better-scroll，默认开启
         this.scroll && this.scroll.enable()
       },
 
-
-      disable() {//禁用 better-scroll
+      disable () { // 禁用 better-scroll
         this.scroll && this.scroll.disable()
       },
 
-      refresh() {//销毁 better-scroll，解绑事件
+      refresh () { // 销毁 better-scroll，解绑事件
         this.scroll && this.scroll.refresh()
       },
-      scrollTo() {
+      scrollTo () {
         this.scroll && this.scroll.scrollTo.apply(this.scroll, arguments)
       },
-      scrollToElement() {
+      scrollToElement () {
         this.scroll && this.scroll.scrollToElement.apply(this.scroll, arguments)
       }
     },
-    watch:{
-      data(){
+    watch: {
+      data () {
         setTimeout(() => {
           this.refresh()
         }, 20)
       }
     }
-  };
+  }
 </script>
 
 <style lang="stylus" rel="stylesheet/stylus">
