@@ -9,36 +9,36 @@ import singerDetail from 'components/singer-detail/singer-detail'
 Vue.use(Router)
 
 export default new Router({
-  routes: [
-    {
-      path: '/',
-      redirect: 'recommend'
-    },
-    {
-      path: '/recommend',
-      name: 'recommend',
-      component: recommend
-    },
-    {
-      path: '/singer',
-      name: 'singer',
-      component: singer,
-      children: [
+    routes: [
         {
-          path: ':id',
-          component: singerDetail
+            path: '/',
+            redirect: 'recommend'
+        },
+        {
+            path: '/recommend',
+            name: 'recommend',
+            component: recommend
+        },
+        {
+            path: '/singer',
+            name: 'singer',
+            component: singer,
+            children: [
+                {
+                    path: ':id',
+                    component: singerDetail
+                }
+            ]
+        },
+        {
+            path: '/rank',
+            name: 'rank',
+            component: rank
+        },
+        {
+            path: '/search',
+            name: 'search',
+            component: search
         }
-      ]
-    },
-    {
-      path: '/rank',
-      name: 'rank',
-      component: rank
-    },
-    {
-      path: '/search',
-      name: 'search',
-      component: search
-    }
-  ]
+    ]
 })

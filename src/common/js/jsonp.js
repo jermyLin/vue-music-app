@@ -1,24 +1,26 @@
 import originJSONP from 'jsonp'
 
-export default function jsonp(url, data, option) {
-  url += (url.indexOf('?') < 0 ? '?' : '&') + objSerialize(data)
-  return new Promise(function (resolve, reject) {
-    originJSONP(url, option, (err, data) => {
-      if (!err) {
-        resolve(data)
-      } else {
-        reject(err)
-      }
+export default function jsonp (url, data, option) {
+    url += (url.indexOf('?') < 0 ? '?' : '&') + objSerialize(data)
+    return new Promise(function (resolve, reject) {
+        originJSONP(url, option, (err, data) => {
+            if (!err) {
+                resolve(data)
+            } else {
+                reject(err)
+            }
+        })
     })
-  })
 }
+
 // json参数序列化
-function objSerialize(obj) {
-  return Object.keys(obj).map(function (k) {
-    obj[k] = obj[k] === undefined ? '' : obj[k]
-    return `${encodeURIComponent(k)}=${encodeURIComponent(obj[k])}`
-  }).join('&')
+function objSerialize (obj) {
+    return Object.keys(obj).map(function (k) {
+        obj[k] = obj[k] === undefined ? '' : obj[k]
+        return `${encodeURIComponent(k)}=${encodeURIComponent(obj[k])}`
+    }).join('&')
 }
+
 // import originJsonp from 'jsonp'
 //
 // export default function jsonp(url, data, option) {

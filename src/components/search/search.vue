@@ -1,9 +1,9 @@
 <template>
-  <div>搜索页面</div>
+    <div>搜索页面</div>
 </template>
 
 <script type="text/ecmascript-6">
-  export default {}
+    export default {}
 </script>
 
 <style lang="stylus" ref="stylesheet/stylus">
