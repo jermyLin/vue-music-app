@@ -49,7 +49,6 @@
                     if (res.code === ERR_OK) {
                         this.singerList = this._normalizeSinger(res.data.list)
                     }
-                    console.log(res.data.list)
                 })
             },
             _normalizeSinger (list) {

@@ -91,6 +91,7 @@
                 })
             },
             currentIndex () { // 计算滚动高度落在滚动区间的索引值
+                console.log('currentIndex')
                 for (let i = 0; i < this.listHeight.length; i++) {
                     let height1 = this.listHeight[i]
                     let height2 = this.listHeight[i + 1]
