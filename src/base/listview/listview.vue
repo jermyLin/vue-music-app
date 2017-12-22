@@ -91,7 +91,6 @@
                 })
             },
             currentIndex () { // 计算滚动高度落在滚动区间的索引值
-                console.log('currentIndex')
                 for (let i = 0; i < this.listHeight.length; i++) {
                     let height1 = this.listHeight[i]
                     let height2 = this.listHeight[i + 1]
@@ -127,7 +126,6 @@
                 let dalta = Math.floor((this.touch.y2 - this.touch.y1) / ANCHOR_HEIGHT)
                 // 计算滚动在第几个元素上的索引值
                 let anchorIndex = parseInt(this.touch.anchorIndex) + dalta
-                console.log(anchorIndex)
                 this._scrollTo(anchorIndex)
             },
             scroll (pos) { // better-scroll监听的页面滚动事件
@@ -139,7 +137,6 @@
                 this.$emit('select', item)
             },
             _scrollTo (index) {
-                console.log(index)
                 if (!index && index !== 0) {
                     return
                 }
@@ -160,7 +157,6 @@
                     height += groupList[i].clientHeight
                     this.listHeight.push(height)
                 }
-                console.log(this.listHeight)
             }
         }
     }

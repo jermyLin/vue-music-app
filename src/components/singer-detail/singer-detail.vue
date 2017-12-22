@@ -25,7 +25,7 @@
             musicList
         },
         created () {
-            console.log(this.singer)
+            console.log('this.singer', this.singer)
             this._getDetail(this.singer.id)
         },
         computed: {

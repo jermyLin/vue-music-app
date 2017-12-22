@@ -77,7 +77,6 @@
                         name: item.Fsinger_name
                     }))
                 })
-                console.log(map)
                 // 为了得到有序列表。把对象map转换成数组
                 let hot = []
                 let ret = []
