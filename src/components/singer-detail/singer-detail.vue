@@ -25,7 +25,6 @@
             musicList
         },
         created () {
-            console.log('this.singer', this.singer)
             this._getDetail(this.singer.id)
         },
         computed: {
@@ -39,9 +38,9 @@
                 'singer'
             ])
             // ...mapGetters语法糖等价于下面singer方法
-//      singer() {
-//       return this.$store.getters.singer
-//      }
+            // singer() {
+            //     return this.$store.getters.singer
+            // }
         },
         methods: {
             _getDetail (id) {
@@ -51,12 +50,12 @@
                 }
                 getSingerDetail(id).then((res) => {
                     if (res.code === ERR_OK) {
-                        this.songs = this._normalzieSong(res.data.list)
+                        this.songs = this._normalZieSong(res.data.list)
                         console.log(this.songs)
                     }
                 })
             },
-            _normalzieSong (list) {
+            _normalZieSong (list) {
                 let ret = []
                 list.forEach((item) => {
                     let {musicData} = item
