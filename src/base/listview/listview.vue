@@ -125,8 +125,7 @@
                 // 计算触摸滑动的偏移量除以每个字母的高度。获取滚动了几个字母元素
                 let dalta = Math.floor((this.touch.y2 - this.touch.y1) / ANCHOR_HEIGHT);
                 // 计算滚动在第几个元素上的索引值
-                let anchorIndex = parseInt(this.touch.anchorIndex) + dalta;
-                console.log(anchorIndex);
+                let anchorIndex = parseInt(this.touch.anchorIndex) + dalta
                 this._scrollTo(anchorIndex)
             },
             scroll (pos) { // better-scroll监听的页面滚动事件
@@ -138,7 +137,6 @@
                 this.$emit('select', item)
             },
             _scrollTo (index) {
-                console.log(index);
                 if (!index && index !== 0) {
                     return
                 }
@@ -159,7 +157,6 @@
                     height += groupList[i].clientHeight;
                     this.listHeight.push(height)
                 }
-                console.log(this.listHeight)
             }
         }
     }

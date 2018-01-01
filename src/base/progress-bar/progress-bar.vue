@@ -33,7 +33,6 @@
             progressTouchStart (e) {
                 this.touch.initiated = true
                 this.touch.startX = e.touches[0].pageX
-                console.log(this.touch.startX)
                 this.touch.left = this.$refs.progress.clientWidth
             },
             progressTouchMove (e) {
@@ -64,32 +63,6 @@
                 const percent = this.$refs.progress.clientWidth / barWidth
                 this.$emit('percentChange', percent)
             },
-//      progressTouchStart(e) {
-//        this.touch.initiated = true
-//        this.touch.startX = e.touches[0].pageX
-//        this.touch.left = this.$refs.progress.clientWidth
-//      },
-//      progressTouchMove(e) {
-//        if (!this.touch.initiated) {
-//          return
-//        }
-//        const deltaX = e.touches[0].pageX - this.touch.startX
-//        const offsetWidth = Math.min(this.$refs.progressBar.clientWidth - progressBtnWidth, Math.max(0, this.touch.left + deltaX))
-//        this._offset(offsetWidth)
-//      },
-//      progressTouchEnd() {
-//        this.touch.initiated = false
-//        this._triggerPercent()
-//      },
-//      progressClick(e) {
-//        const rect = this.$refs.progressBar.getBoundingClientRect()
-//        const offsetWidth = e.pageX - rect.left
-//        this._offset(offsetWidth)
-//        // 这里当我们点击 progressBtn 的时候，e.offsetX 获取不对
-//        // this._offset(e.offsetX)
-//        this._triggerPercent()
-//      },
-
             _offset (offsetWidth) {
                 this.$refs.progress.style.width = `${offsetWidth}px`
                 this.$refs.progressBtn.style[transform] = `translate3d(${offsetWidth}px,0,0)`

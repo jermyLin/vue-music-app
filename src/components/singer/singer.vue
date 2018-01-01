@@ -49,7 +49,6 @@
                     if (res.code === ERR_OK) {
                         this.singerList = this._normalizeSinger(res.data.list)
                     }
-                    console.log(res.data.list)
                 })
             },
             _normalizeSinger (list) {
@@ -78,7 +77,6 @@
                         name: item.Fsinger_name
                     }))
                 })
-                console.log(map)
                 // 为了得到有序列表。把对象map转换成数组
                 let hot = []
                 let ret = []

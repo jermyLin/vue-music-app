@@ -13,15 +13,15 @@ import 'swiper/dist/css/swiper.css'
 
 Vue.use(VueAwesomeSwiper)
 Vue.use(vueLazyLoad, {
-  loading: require('common/image/default.png')
+    loading: require('common/image/default.png')
 })
 FastClick.attach(document.body)
 Vue.config.productionTip = false
 
 /* eslint-disable no-new */
 new Vue({
-  el: '#app',
-  router,
-  store,
-  render: h => h(App)
+    el: '#app',
+    router,
+    store,
+    render: h => h(App)
 })
