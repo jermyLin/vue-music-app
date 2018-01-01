@@ -43,8 +43,8 @@
     import { getData } from 'common/js/dom'
     import loading from 'base/loading/loading'
 
-    const TITLE_HEIGHT = 30
-    const ANCHOR_HEIGHT = 18
+    const TITLE_HEIGHT = 30;
+    const ANCHOR_HEIGHT = 18;
     export default {
         props: {
             data: {
@@ -65,8 +65,8 @@
             }
         },
         created () {
-            this.touch = {}
-            this.listenScroll = true
+            this.touch = {};
+            this.listenScroll = true;
             this.probeType = 3
         },
         watch: {
@@ -76,11 +76,11 @@
                 }, 20)
             },
             diff (newVal) {
-                let fixedTop = (newVal > 0 && newVal < TITLE_HEIGHT) ? newVal - TITLE_HEIGHT : 0
+                let fixedTop = (newVal > 0 && newVal < TITLE_HEIGHT) ? newVal - TITLE_HEIGHT : 0;
                 if (this.fixedTop === fixedTop) {
                     return
                 }
-                this.fixedTop = fixedTop
+                this.fixedTop = fixedTop;
                 this.$refs.fixed.style.transform = `translate3d(0,${fixedTop}px,0)`
             }
         },
@@ -92,10 +92,10 @@
             },
             currentIndex () { // 计算滚动高度落在滚动区间的索引值
                 for (let i = 0; i < this.listHeight.length; i++) {
-                    let height1 = this.listHeight[i]
-                    let height2 = this.listHeight[i + 1]
+                    let height1 = this.listHeight[i];
+                    let height2 = this.listHeight[i + 1];
                     if (!height2 || (this.scrollY >= height1 && this.scrollY < height2)) {
-                        this.diff = height2 + this.pos_y
+                        this.diff = height2 + this.pos_y;
                         return i
                     }
                 }
@@ -113,24 +113,24 @@
                 this.$refs.listview.refresh()
             },
             onShortCutTouchStart (e) { // 右侧字母栏点击事件
-                let anchorIndex = getData(e.target, 'index')
-                let firstTouch = e.touches[0]
-                this.touch.y1 = firstTouch.pageY
-                this.touch.anchorIndex = anchorIndex
+                let anchorIndex = getData(e.target, 'index');
+                let firstTouch = e.touches[0];
+                this.touch.y1 = firstTouch.pageY;
+                this.touch.anchorIndex = anchorIndex;
                 this._scrollTo(anchorIndex)
             },
             onShortCutTouchMove (e) { // 右侧字母栏触摸滑动事件
-                let firstTouch = e.touches[0]
-                this.touch.y2 = firstTouch.pageY
+                let firstTouch = e.touches[0];
+                this.touch.y2 = firstTouch.pageY;
                 // 计算触摸滑动的偏移量除以每个字母的高度。获取滚动了几个字母元素
-                let dalta = Math.floor((this.touch.y2 - this.touch.y1) / ANCHOR_HEIGHT)
+                let dalta = Math.floor((this.touch.y2 - this.touch.y1) / ANCHOR_HEIGHT);
                 // 计算滚动在第几个元素上的索引值
-                let anchorIndex = parseInt(this.touch.anchorIndex) + dalta
-                console.log(anchorIndex)
+                let anchorIndex = parseInt(this.touch.anchorIndex) + dalta;
+                console.log(anchorIndex);
                 this._scrollTo(anchorIndex)
             },
             scroll (pos) { // better-scroll监听的页面滚动事件
-                this.pos_y = pos.y
+                this.pos_y = pos.y;
                 this.scrollY = Math.abs(Math.round(this.pos_y))
 //        console.log(this.pos_y)
             },
@@ -138,7 +138,7 @@
                 this.$emit('select', item)
             },
             _scrollTo (index) {
-                console.log(index)
+                console.log(index);
                 if (!index && index !== 0) {
                     return
                 }
@@ -147,16 +147,16 @@
                 } else if (index > this.listHeight.length - 2) {
                     index = this.listHeight.length - 2
                 }
-                this.scrollY = this.listHeight[index]
+                this.scrollY = this.listHeight[index];
 
                 this.$refs.listview.scrollToElement(this.$refs.listGroup[index], 0)
             },
             _calculateHeight () { // 计算左侧歌手列表的高度区间
-                let groupList = this.$refs.listGroup
-                let height = 0
-                this.listHeight.push(height)
+                let groupList = this.$refs.listGroup;
+                let height = 0;
+                this.listHeight.push(height);
                 for (let i = 0; i < groupList.length; i++) {
-                    height += groupList[i].clientHeight
+                    height += groupList[i].clientHeight;
                     this.listHeight.push(height)
                 }
                 console.log(this.listHeight)
