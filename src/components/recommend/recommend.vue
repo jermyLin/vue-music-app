@@ -36,13 +36,13 @@
 </template>
 
 <script type="text/ecmascript-6">
-    import { swiper, swiperSlide } from 'vue-awesome-swiper'
-    import { getRecommend, getDiscList } from 'api/recommend'
-    import { ERR_OK } from 'api/config'
+    import {swiper, swiperSlide} from 'vue-awesome-swiper'
+    import {getRecommend, getDiscList} from 'api/recommend'
+    import {ERR_OK} from 'api/config'
     import slider from 'base/slider/slider'
     import scroll from 'base/scroll/scroll'
     import loading from 'base/loading/loading'
-    import { playlistMixin } from 'common/js/mixin'
+    import {playlistMixin} from 'common/js/mixin'
 
     export default {
         mixins: [playlistMixin],
@@ -54,23 +54,23 @@
             scroll,
             loading
         },
-        data () {
+        data() {
             return {
                 recommends: [],
                 discList: []
             }
         },
-        created () {
+        created() {
             this._getRecommend()
             this._getDiscList()
         },
         methods: {
-            handlePlaylist (playList) {
+            handlePlaylist(playList) {
                 const bottom = playList.length > 0 ? '60px' : ''
                 this.$refs.recommend.style.bottom = bottom
                 this.$refs.scroll.refresh()
             },
-            _getRecommend () {
+            _getRecommend() {
                 getRecommend().then((res) => {
                     if (res.code === ERR_OK) {
                         this.recommends = res.data.slider
@@ -78,7 +78,7 @@
                     }
                 })
             },
-            _getDiscList () {
+            _getDiscList() {
                 getDiscList().then((res) => {
                     if (res.code === ERR_OK) {
                         this.discList = res.data.list
@@ -86,7 +86,7 @@
                     }
                 })
             },
-            loadImages () {
+            loadImages() {
                 if (!this.checkLoaded) {
                     this.$refs.scroll.refresh()
                     this.checkLoaded = true
