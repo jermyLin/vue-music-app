@@ -42,16 +42,16 @@
                 const deltaX = e.touches[0].pageX - this.touch.startX
                 const offsetWidth = Math.min(this.$refs.progressBar.clientWidth - progressBtnWidth, Math.max(0, this.touch.left + deltaX))
                 this._offset(offsetWidth)
-                console.log(deltaX)
             },
             progressTouchEnd () {
                 this.touch.initiated = false
                 this._triggerPercent()
             },
             progressClick (e) {
-//        const rect = this.$refs.progressBar.getBoundingClientRect()
-//        console.log(rect.left)
-//        console.log(this.$refs.progressBar.offsetLeft)
+                // const rect = this.$refs.progressBar.getBoundingClientRect()
+                // console.log(rect.left)
+                // console.log(this.$refs.progressBar.offsetLeft)
+                // console.log(e)
                 const offsetWidth = e.pageX - this.$refs.progressBar.offsetLeft
                 this._offset(offsetWidth)
                 // 这里当我们点击 progressBtn 的时候，e.offsetX 获取不对
