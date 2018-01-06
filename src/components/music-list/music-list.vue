@@ -85,7 +85,6 @@
         },
         methods: {
             handlePlaylist(playList) {
-                console.log(playList.length)
                 const bottom = playList.length > 0 ? '60px' : '';
                 this.$refs.list.$el.style.bottom = bottom;
                 this.$refs.list.refresh()
@@ -114,7 +113,6 @@
         },
         watch: {
             scrollY(newY) {
-                console.log(newY)
                 let translateY = Math.max(this.minTransalteY, newY)
                 let zIndex = 0;
                 let scale = 1;
